@@ -1,12 +1,13 @@
 CC = gcc
-# 采用O2的优化级别,Wall生成所有警告信息
-# I 参数指定在上一级中搜索头文件
-CFLAGS = -O2 -Wall -I ..
+# Wall生成所有警告信息
+CFLAGS = -m64 -Wall -pthread
 
-all: adder
+all: 
+	$(CC) $(CFLAGS) adder.c ../csapp.c -o adder
 
-adder: adder.c
-	$(CC) $(CFLAGS) -o adder adder.c
-
+.PHONY: clean
 clean:
-	rm -f adder *~
+	@# find -type指定查询块设备,目录,字符设备,管道,符号链接,普通文件,后面-f参数表示查询普通文件
+	@# -executable对于查找的文件执行操作, 后面的-print0打印文件,加上0不会添加回车换行符
+	@# xargs是给其他命令传递参数的一个过滤器, rm后面的--表示对于以"-"开始的文件以删除
+	find . -type -f -executable -print0 | xargs -0 rm -f --

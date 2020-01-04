@@ -1,25 +1,23 @@
+# makefile
+#
 CC = gcc
-CFLAGS = -O2 -Wall -I .
+CFLAGS = -m64 -Wall -pthread
+# 在当前目录获取所有的tiny.*.c的文件
+SRCS = $(wildcard tiny.*.c)
+# 将SRCS中的所有文件已.c结尾的去除.c
+PROGS = $(patsubst %.c, %, $(SRCS))
 
-# This flag includes the Pthreads library on a Linux box.
-# # Others systems will probably require something different.
-LIB = -lpthread
+all: $(PROGS)
+	(cd cgi-bin; make)
 
-# 冒号前是目标,冒号后是前置条件
-all: tiny cgi
-
-tiny: tiny.c csapp.o
-	@# -o 指定编译文件的结果文件名称
-	$(CC) $(CFLAGS) -o tiny tiny.c csapp.o $(LIB)
-
-csapp.o: csapp.c
-	@# -c参数只激活预处理,编译和汇编
-	$(CC) ${CLAGS} -c csapp.c
+%: %.c
+	@# $@指代当前目标, $<指代第一个前置条件,在这里就是要编译的.c文件
+	$(CC) $(CFLAGS) -o $@ $< csapp.c
 
 cgi: 
 	(cd cgi-bin; make)
 
 .PHONY : clean
 	clean:
-	rm -f *.o tiny *~
 	(cd cgi-bin; make clean)
+	find . -type f -executable -print0 | xargs -0 rm -f --
